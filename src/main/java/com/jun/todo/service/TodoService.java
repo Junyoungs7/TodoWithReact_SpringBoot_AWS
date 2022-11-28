@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -38,4 +39,32 @@ public class TodoService {
         log.info("Entity Id : {} is saved.", entity.getId());
         return todoRepository.findByUserId(entity.getUserId());
     }
+
+    public List<TodoEntity> retrieve(final String userId) {
+        log.info("User Id : {} is retrieve.", userId);
+        return todoRepository.findByUserId(userId);
+    }
+
+    public List<TodoEntity> update(final TodoEntity entity) {
+        validate(entity);
+        final Optional<TodoEntity> original = todoRepository.findById(entity.getId());
+        original.ifPresent(todo -> {
+            todo.setTitle(entity.getTitle());
+            todo.setDone(entity.isDone());
+            todoRepository.save(todo);
+        });
+        return retrieve(entity.getUserId());
+    }
+
+    public List<TodoEntity> delete(final TodoEntity entity) {
+        validate(entity);
+        try {
+            todoRepository.delete(entity);
+        } catch (Exception e) {
+            log.error("error deleting entity", entity.getId(), e);
+            throw new RuntimeException("error deleting entity " + entity.getId());
+        }
+        return retrieve(entity.getUserId());
+    }
+
 }
