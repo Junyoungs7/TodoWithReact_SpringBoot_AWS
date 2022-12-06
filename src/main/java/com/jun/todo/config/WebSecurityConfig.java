@@ -34,8 +34,10 @@ public class WebSecurityConfig {
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/", "/auth/**").permitAll()
-                .anyRequest().authenticated();
+                .authorizeRequests().antMatchers("/", "/auth/**", "/oauth2/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .oauth2Login();
 
         http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
 
