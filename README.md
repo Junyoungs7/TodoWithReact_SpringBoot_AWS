@@ -1,6 +1,6 @@
 # TodoWithReact_SpringBoot_AWS
 
-# 백엔드 파트
 
- - 12월 1일
-  - todo CRUD + 로그인 인증, 인가, 비밀번호 
+
+# React.js, 스프링 부트, AWS로 배우는 웹 개발 101 
+ - 백엔드 
