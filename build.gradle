@@ -16,12 +16,15 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client', version: '6.0.0'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
@@ -34,4 +37,28 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+task('release') {
+	/* ./gradlew build를 먼저 실행하라는 뜻이다. */
+	dependsOn("build")
+
+	doLast {
+		def stdout = new ByteArrayOutputStream()
+		/* exec - 커맨드 라인 프로세서; 파워셸/터미널에서 실행하는 것과 같다. */
+		exec {
+			/* $eb setenv SPRING_PROFILES_ACTIVE=prod */
+			commandLine 'eb', 'setenv', 'SPRING_PROFILES_ACTIVE=prod'
+			standardOutput = stdout
+		}
+		/* 결과 로깅을 위한 작업 */
+		println "eb setenv SPRING_PROFILES_ACTIVE=prod :\n$stdout";
+		exec {
+			/* $eb deploy */
+			commandLine 'eb', 'deploy'
+			standardOutput = stdout
+		}
+		println "eb deploy :\n$stdout";
+		println "Release succeeded."
+	}
 }
